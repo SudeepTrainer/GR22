@@ -24,6 +24,27 @@ app.get("/api/product/:productID", (req, res) => {
   res.status(200).send("hello");
 });
 
+app.get("/api/v1/search", (req, res) => {
+  console.log(req.query);
+  let sortedProducts = [...products];
+  const { query, limit } = req.query;
+  if (query) {
+    sortedProducts = sortedProducts.filter((product) => {
+      return product.brand.startsWith(query);
+    });
+  }
+  if (limit) {
+    sortedProducts = sortedProducts.slice(0, limit);
+  }
+  if (sortedProducts.length > 1) {
+    res.status(200).json(sortedProducts);
+  } else {
+    res
+      .status(200)
+      .json({ data: [], message: `No results found for ${query}` });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
 });

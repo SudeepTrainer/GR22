@@ -2,13 +2,15 @@ const { products } = require("./products");
 const express = require("express");
 const logger = require("./logger");
 const authenticate = require("./authenticate");
+const morgan = require("morgan");
 const PORT = 8000;
 const app = express();
 
 // middleware
-app.use([logger,authenticate]);
+// app.use([logger,authenticate]);
+app.use(morgan("tiny"));
 
-// routing methods
+// routing methods150
 app.get("/api/products", (req, res) => {
   const mappedProducts = products.map((product) => {
     const { name, brand, price, rating } = product;

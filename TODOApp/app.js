@@ -3,6 +3,8 @@ const connectDb = require("./db/connect");
 require("dotenv").config();
 const router = require("./routes/todo");
 const notfound = require("./middleware/notfound");
+const errorHandler = require("./middleware/CutomErrorHandler");
+
 const PORT = 5000;
 
 const app = express();
@@ -10,6 +12,8 @@ const app = express();
 app.use(express.json());
 app.use("/api/v1/todos", router);
 app.use(notfound);
+app.use(errorHandler);
+
 const start = async () => {
   try {
     await connectDb(process.env.DB_URL);

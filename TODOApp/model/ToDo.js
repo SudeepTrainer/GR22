@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 // creating the structure of the document
 // defining the fields and their types
 const ToDoSchema = new mongoose.Schema({
-  createdOn: {
+  time: {
     type: Date,
+    default: Date.now,
   },
   title: {
     type: String,

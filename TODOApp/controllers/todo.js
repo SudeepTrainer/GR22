@@ -41,7 +41,7 @@ const deleteToDo = asyncWrapper(async (req, res) => {
 const updateToDo = asyncWrapper(async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
-  const updatedToDo = await ToDoModel.findByIdAndUpdate(id, updatedData, {
+  const updatedToDo = await TodoModel.findByIdAndUpdate(id, updatedData, {
     new: true,
     runValidators: true,
   });

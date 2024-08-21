@@ -190,15 +190,24 @@ export function Playground() {
     // axios delete
   };
 
-  const handleToggleTodo = (index) => {
+  const handleToggleTodo = async (index) => {
     const updatedTodos = [...todos];
     updatedTodos[index].completed = !updatedTodos[index].completed;
     setTodos(updatedTodos);
-    console.log("up", updatedTodos);
-    toast({
-      title: "Todo Updated",
-      description: "Your todo has been updated successfully",
-    });
+    const id = todos[index]._id;
+    try {
+      const response = await axios.patch(`${API_URL}${id}`, {
+        completed: updatedTodos[index].completed,
+      });
+      if (response.status === 200) {
+        toast({
+          title: "Todo Updated",
+          description: "Your todo has been updated successfully",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // on any change in todos, print it

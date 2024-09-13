@@ -1,7 +1,12 @@
 import bcrypt from "bcrypt";
 import UserModel from "../models/user.js";
+import crypto from "crypto";
 
 // const users = [];
+
+const generateSessionID = () => {
+  return crypto.randomBytes(16).toString("hex");
+};
 
 export const createUser = async (req, res) => {
   // get the username and password
@@ -31,5 +36,11 @@ export const verifyUser = async (req, res) => {
     res.status(200).send("Incorrect password");
     return;
   }
+  const sessionID = generateSessionID();
+  console.log(sessionID);
+
+  // httpOnly is for preventing XSS(cross site scripting) attacks.
+  res.cookie("sessionToken", sessionID, { maxAge: 3600000, httpOnly: true });
+
   res.send(`Welcome ${username}`);
 };

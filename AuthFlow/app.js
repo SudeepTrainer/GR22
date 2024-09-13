@@ -1,10 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
 import router from "./routes/authroute.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 //middleware
 app.use(express.json());
+// parses the cookie header and populates req.cookies
+app.use(cookieParser());
 app.use(router);
 app.listen(3000, async () => {
   await mongoose.connect("mongodb://127.0.0.1:27017/auth");

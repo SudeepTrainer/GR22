@@ -1,0 +1,30 @@
+<html>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const {createElement} = window.React;
+            const {createRoot} = window.ReactDOM;
+            
+            // const element = createElement("div",{className:"inner"},
+            //     createElement("p",null,"Important things to learn"),
+            //     createElement("ul",null,
+            //          createElement("li",null,"Learn React"),
+            //         createElement("li",null,"Learn Redux")
+            //     )
+            // );
+            const element = <div>
+                    <p>Important things to learn</p>
+                    <ul>
+                        <li>React</li>
+                        <li>Redux</li>
+                    </ul>
+                    </div>;
+            const domNode = document.getElementById('root');
+            const root = createRoot(domNode);
+            root.render(element);
+        </script>
+    </body>
+</html>

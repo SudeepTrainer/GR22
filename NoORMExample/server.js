@@ -1,7 +1,8 @@
 import express from "express";
 import client from "./db.js";
+
 const app = express();
-app.use(express.json());
+const PORT = 4000;
 app.get("/createusers", async (req, res) => {
   try {
     const result = await client.query(
@@ -18,22 +19,6 @@ app.get("/createusers", async (req, res) => {
     res.status(500).send("Internal server error");
   }
 });
-
-app.post("/adduser", async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    const result = await client.query(
-      `INSERT INTO users(name,email,password)
-            VALUES($1,$2,$3) RETURNING *
-            `,
-      [name, email, password]
-    );
-    res.status(200).send(`${result} record created`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal server error");
-  }
-});
-app.listen(5000, () => {
-  console.log("Server running");
+app.listen(PORT, () => {
+  console.log(`server running on ${PORT}`);
 });

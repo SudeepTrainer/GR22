@@ -26,6 +26,8 @@ model User{
     posts Post[]
     comments Comment[]
     likes Like[]
+    followers Follow[] @relation("Followers")
+    following Follow[] @relation("Following")
 }
 
 model Post {
@@ -72,4 +74,21 @@ enum ReactionType{
     SAD
     HAPPY
     WOW
+}
+
+model Follow{
+    id Int @id @default(autoincrement())
+    follower User @relation("Followers", fields: [followerid], references: [id])
+    followerid Int
+    following User @relation("Following", fields: [followingid], references: [id])
+    followingid Int
+    createdAt DateTime @default(now())
+    status StatusType @default(PENDING)
+    @@unique([followerid,followingid]) // composite primary key
+}
+enum StatusType{
+    PENDING
+    ACTIVE
+    REJECTED
+    BLOCKED
 }

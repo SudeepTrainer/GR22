@@ -1,8 +1,10 @@
 import express from "express";
 import {
   createUser,
+  deleteUser,
   getAllUsers,
   getSingleUser,
+  updateUser,
 } from "../controllers/userController.js";
 
 const userRouter = express.Router();
@@ -12,5 +14,8 @@ userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getSingleUser);
 //create user
 userRouter.post("/", createUser);
-
+// update user
+userRouter.put("/:id", updateUser);
+// delete user
+userRouter.delete("/:id", deleteUser);
 export default userRouter;

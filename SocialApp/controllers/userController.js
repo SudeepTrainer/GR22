@@ -49,3 +49,33 @@ export const createUser = async (req, res) => {
     res.status(501).json({ status: "User not created" });
   }
 };
+// update user
+export const updateUser = async (req, res) => {
+      try {
+        const {id} = req.params;
+        const {email,username,name,bio,avatarUrl} = req.body;
+        const updatedUser = await prisma.user.update({
+            where:{id:parseInt(id)},
+            data:{email,username,name,bio,avatarUrl}
+        })
+        res.status(200).json(updatedUser);
+      } catch (error) {
+        console.log(error);
+        res.status(501).json({ status: "User not updated" });
+      }
+};
+// delete user
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.user.delete({
+        where: { id: parseInt(id) },
+    });
+    res.status(200).json({"message":"User deleted"});
+
+  } catch (error) {
+    console.log(error);
+    res.status(501).json({ status: "User not deleted" });
+  }
+};

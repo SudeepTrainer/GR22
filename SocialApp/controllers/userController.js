@@ -31,7 +31,7 @@ export const getSingleUser = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-  const { email, name, username, password } = req.body;
+  const { email, name, username, password, avatarUrl } = req.body;
   try {
     const user = await prisma.user.create({
       data: {
@@ -39,6 +39,7 @@ export const createUser = async (req, res) => {
         name,
         username,
         password,
+        avatarUrl,
       },
     });
     if (user) {

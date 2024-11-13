@@ -1,6 +1,18 @@
 import { PrismaClient } from "@prisma/client";
+import cloudinary from "../config/cloudinaryConfig.js";
 const prisma = new PrismaClient();
+import fs from "fs";
+import path from "path";
 
+const removeFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("File not deleted");
+    } else {
+      console.log("file was deleted");
+    }
+  });
+};
 export const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany();
@@ -31,7 +43,22 @@ export const getSingleUser = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-  const { email, name, username, password, avatarUrl } = req.body;
+  const { email, name, username, password } = req.body;
+  // Upload an image
+  console.log(req.file.path);
+
+  const uploadResult = await cloudinary.uploader
+    .upload(req.file.path, {
+      folder: "avatars",
+      resource_type: "image",
+    })
+    .catch((error) => {
+      console.log(error);
+      removeFile(req.file.path);
+    });
+
+  console.log(uploadResult);
+
   try {
     const user = await prisma.user.create({
       data: {
@@ -39,7 +66,7 @@ export const createUser = async (req, res) => {
         name,
         username,
         password,
-        avatarUrl,
+        avatarUrl: uploadResult.secure_url,
       },
     });
     if (user) {

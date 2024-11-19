@@ -7,6 +7,7 @@ const PORT = 4000;
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/user", userRouter);
 app.use("/follow", followRouter);
 app.use("/post", postsRouter);

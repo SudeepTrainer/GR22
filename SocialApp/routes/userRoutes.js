@@ -5,6 +5,7 @@ import {
   getAllUsers,
   getSingleUser,
   loginUser,
+  refreshToken,
   updateUser,
 } from "../controllers/userController.js";
 import upload from "../config/multerConfig.js";
@@ -22,5 +23,6 @@ userRouter.put("/:id", updateUser);
 userRouter.delete("/:id", deleteUser);
 // login
 userRouter.post("/login", loginUser);
+userRouter.post("/refreshToken", refreshToken);
 
 export default userRouter;

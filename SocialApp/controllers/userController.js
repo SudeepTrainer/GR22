@@ -3,6 +3,10 @@ import cloudinary from "../config/cloudinaryConfig.js";
 import fs from "fs";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../middleware/authMIddleware.js";
+import jwt from "jsonwebtoken";
+
+const REFRESH_SECRET = process.env.JWT_REFRESH_KEY;
+
 const prisma = new PrismaClient();
 
 const removeFile = (filePath) => {
@@ -110,8 +114,8 @@ export const deleteUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
-  console.log("username",username);
-  
+  console.log("username", username);
+
   try {
     const user = await prisma.user.findUnique({
       where: { username: username },
@@ -121,10 +125,66 @@ export const loginUser = async (req, res) => {
     if (!isPasswordValid)
       return res.status(404).json({ message: "Password not matched" });
     // generate token
-    const accessToken = generateToken(user);
-    res.status(200).json({ user, accessToken });
+    const { accessToken, refreshToken } = generateToken(user);
+    // create refresh token record
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      },
+    });
+
+    res.status(200).json({ user, accessToken, refreshToken });
   } catch (error) {
     console.log(error);
     res.status(501).json({ status: "Login failed" });
+  }
+};
+// refresh token endpoint to issue a new access token
+
+export const refreshToken = async (req, res) => {
+  const { refreshtoken } = req.body;
+  if (!refreshtoken) {
+    return res.status(401).json({ message: "Refresh token is required" });
+  }
+  try {
+    const decoded = jwt.verify(refreshtoken, REFRESH_SECRET);
+    if (isNaN(decoded.userId)) {
+      return res.status(400).json({ message: "Invalid userid in token" });
+    }
+    const tokenRecord = await prisma.refreshToken.findUnique({
+      where: { token: refreshtoken },
+    });
+    console.log(tokenRecord);
+    if (
+      !tokenRecord ||
+      tokenRecord.isRevoked ||
+      tokenRecord.expiresAt < new Date()
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Invalid refresh token or revoked" });
+    }
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    // generate access token
+    const { accessToken, refreshToken } = generateToken(user);
+    await prisma.refreshToken.update({
+      where: { id: tokenRecord.id },
+      data: {
+        token: refreshToken,
+        isRevoked: false,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+    res.status(200).json({ accessToken, refreshToken });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ status: "Refresh Token failed" });
   }
 };

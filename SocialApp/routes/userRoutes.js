@@ -5,6 +5,7 @@ import {
   getAllUsers,
   getSingleUser,
   loginUser,
+  logout,
   refreshToken,
   updateUser,
 } from "../controllers/userController.js";
@@ -23,6 +24,8 @@ userRouter.put("/:id", updateUser);
 userRouter.delete("/:id", deleteUser);
 // login
 userRouter.post("/login", loginUser);
+userRouter.post("/logout", logout);
+
 userRouter.post("/refreshToken", refreshToken);
 
 export default userRouter;

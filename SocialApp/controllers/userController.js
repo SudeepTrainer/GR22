@@ -188,3 +188,35 @@ export const refreshToken = async (req, res) => {
     res.status(403).json({ status: "Refresh Token failed" });
   }
 };
+
+export const logout = async (req, res) => {
+  const { refreshtoken } = req.body;
+  if (!refreshtoken) {
+    return res.status(401).json({ message: "Refresh token is required" });
+  }
+  try {
+    const decoded = jwt.verify(refreshtoken, REFRESH_SECRET);
+    // check refresh token in db
+    const tokenRecord = await prisma.refreshToken.findUnique({
+      where: { token: refreshtoken },
+    });
+    if (
+      !tokenRecord ||
+      tokenRecord.isRevoked ||
+      tokenRecord.expiresAt < new Date()
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Invalid refresh token or already revoked" });
+    }
+    // revoke the token
+    await prisma.refreshToken.update({
+      where: { token: refreshtoken },
+      data: { isRevoked: true },
+    });
+    res.status(200).json({ messsage: "Logout success" });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ status: "Logout failed" });
+  }
+};
